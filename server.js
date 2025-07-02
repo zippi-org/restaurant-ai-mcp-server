@@ -122,7 +122,17 @@ async function initializeDatabase() {
         instagram_story_id VARCHAR(200)
       )
     `);
-
+await client.query(`
+  CREATE TABLE IF NOT EXISTS industry_trends (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    topic VARCHAR(100),
+    trend_description TEXT,
+    significance_level INTEGER,
+    timeline VARCHAR(50),
+    impact_areas JSONB,
+    relevant_keywords TEXT[]
+  )
+`);
     console.log('✅ Database initialized successfully');
   } catch (error) {
     console.error('❌ Database initialization error:', error);
