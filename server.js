@@ -774,7 +774,7 @@ app.post('/setup/populate-knowledge-base', async (req, res) => {
        '{"restaurant_industry": "important", "segment": "small_business", "ease_of_use": "high"}',
        '["Simple setup", "Transparent pricing", "Hardware + software bundle"]',
        'Popular with small cafes and quick-service restaurants. Easy entry point for technology adoption.')
-      ON CONFLICT (name) DO NOTHING
+      ON CONFLICT DO NOTHING
       RETURNING id
     `);
     
@@ -793,7 +793,7 @@ app.post('/setup/populate-knowledge-base', async (req, res) => {
        '{"adoption_stage": "early", "labor_savings": "20-30%", "investment": "high"}',
        '["$15,000-50,000 initial investment", "12-18 month ROI", "Consistency improvements"]',
        'Addresses labor shortage directly. High upfront cost but significant ongoing savings for right operators.')
-      ON CONFLICT (name) DO NOTHING
+      ON CONFLICT DO NOTHING
       RETURNING id
     `);
     
@@ -812,7 +812,7 @@ app.post('/setup/populate-knowledge-base', async (req, res) => {
       ('inflation_pressure', 'Rising costs for labor, food, and rent squeezing already thin margins below 3% for many operators', 9, 'ongoing challenge',
        '["menu_pricing", "portion_control", "operational_efficiency", "customer_retention"]',
        '["inflation", "food costs", "labor costs", "margin pressure"]')
-      ON CONFLICT (topic) DO NOTHING
+      ON CONFLICT DO NOTHING
       RETURNING id
     `);
     
@@ -831,7 +831,7 @@ app.post('/setup/populate-knowledge-base', async (req, res) => {
        '["$40,000 annual savings", "18-month payback period", "Reduces labor costs by 25%"]',
        '["Significant savings", "Improved efficiency", "Cost-effective solution"]',
        '["blog_content", "social_posts", "analysis"]', 1)
-      ON CONFLICT (guideline_name) DO NOTHING
+      ON CONFLICT DO NOTHING
       RETURNING id
     `);
     
