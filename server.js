@@ -38,8 +38,8 @@ async function initializeDatabase() {
         processed_date TIMESTAMP DEFAULT NOW(),
         topic VARCHAR(100),
         key_entities JSONB,
-        title_embedding vector(768),
-        content_embedding vector(768),
+        // title_embedding vector(768),
+        // content_embedding vector(768),
         blog_published BOOLEAN DEFAULT FALSE,
         blog_url VARCHAR(1000)
       )
