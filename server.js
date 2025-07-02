@@ -171,12 +171,40 @@ function cosineSimilarity(a, b) {
 app.post('/knowledge/check-duplicates', async (req, res) => {
   try {
     const { articles, topic, lookback_days = 30 } = req.body;
+    
+    // Debug: Log what we're receiving
+    console.log('Received data:', JSON.stringify({ articles: typeof articles, topic, lookback_days }));
+    console.log('Articles content:', articles);
+    
+    // Validate and normalize articles data
+    let articlesArray = [];
+    if (!articles) {
+      return res.status(400).json({ error: 'Articles parameter is required' });
+    }
+    
+    // Handle different possible data structures
+    if (Array.isArray(articles)) {
+      articlesArray = articles;
+    } else if (articles.articles && Array.isArray(articles.articles)) {
+      articlesArray = articles.articles;
+    } else if (typeof articles === 'object' && articles.articles) {
+      articlesArray = articles.articles;
+    } else {
+      return res.status(400).json({ 
+        error: 'Articles must be an array', 
+        received_type: typeof articles,
+        received_data: articles 
+      });
+    }
+    
+    console.log('Processing', articlesArray.length, 'articles');
+    
     const client = await pool.connect();
     
     const filtered_articles = [];
     const filtered_out = [];
     
-    // Get existing articles from last N days
+    // Get existing articles from last N days (simplified - just check URLs)
     const lookbackDate = new Date();
     lookbackDate.setDate(lookbackDate.getDate() - lookback_days);
     
@@ -186,8 +214,13 @@ app.post('/knowledge/check-duplicates', async (req, res) => {
       WHERE processed_date > $1 AND topic = $2
     `, [lookbackDate, topic]);
     
-    for (const article of articles) {
-      // Check URL duplication
+    for (const article of articlesArray) {
+      if (!article || !article.url) {
+        console.log('Skipping invalid article:', article);
+        continue;
+      }
+      
+      // Check URL duplication only (no embedding similarity)
       const urlExists = existingArticles.rows.find(existing => existing.url === article.url);
       if (urlExists) {
         filtered_out.push({
@@ -198,27 +231,17 @@ app.post('/knowledge/check-duplicates', async (req, res) => {
         continue;
       }
       
-      // Check title similarity using embeddings
-      const titleEmbedding = await getEmbedding(article.title);
-      let maxSimilarity = 0;
-      let mostSimilar = null;
+      // Simple title similarity check (no embeddings)
+      const titleExists = existingArticles.rows.find(existing => 
+        existing.title && article.title && 
+        existing.title.toLowerCase().includes(article.title.toLowerCase().substring(0, 20))
+      );
       
-      for (const existing of existingArticles.rows) {
-        if (existing.title_embedding) {
-          const similarity = cosineSimilarity(titleEmbedding, existing.title_embedding);
-          if (similarity > maxSimilarity) {
-            maxSimilarity = similarity;
-            mostSimilar = existing;
-          }
-        }
-      }
-      
-      // Threshold for similarity (85%)
-      if (maxSimilarity > 0.85) {
+      if (titleExists) {
         filtered_out.push({
           title: article.title,
-          reason: `${Math.round(maxSimilarity * 100)}% similar to existing article`,
-          similar_to: { title: mostSimilar.title, published_date: mostSimilar.published_date }
+          reason: 'Similar title found',
+          similar_to: { title: titleExists.title, published_date: titleExists.published_date }
         });
       } else {
         filtered_articles.push(article);
@@ -231,7 +254,7 @@ app.post('/knowledge/check-duplicates', async (req, res) => {
       filtered_articles,
       filtered_out,
       statistics: {
-        total_input: articles.length,
+        total_input: articlesArray.length,
         duplicates_removed: filtered_out.length,
         unique_articles: filtered_articles.length
       }
@@ -239,7 +262,7 @@ app.post('/knowledge/check-duplicates', async (req, res) => {
     
   } catch (error) {
     console.error('Duplicate check error:', error);
-    res.status(500).json({ error: 'Failed to check duplicates' });
+    res.status(500).json({ error: 'Failed to check duplicates', details: error.message });
   }
 });
 
