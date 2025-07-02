@@ -752,18 +752,6 @@ app.post('/analytics/track-publication', async (req, res) => {
     res.status(500).json({ error: 'Failed to initialize tracking' });
   }
 });
-await client.query(`
-  CREATE TABLE IF NOT EXISTS industry_trends (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    topic VARCHAR(100) UNIQUE,
-    trend_description TEXT,
-    significance_level INTEGER,
-    timeline VARCHAR(100),
-    impact_areas JSONB,
-    relevant_keywords JSONB,
-    created_at TIMESTAMP DEFAULT NOW()
-  )
-`);
 
 // ADD THIS ENDPOINT at the end of your server.js file
 // (Insert this right before the // Health check endpoint comment)
