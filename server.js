@@ -25,7 +25,7 @@ async function initializeDatabase() {
   const client = await pool.connect();
   try {
     // Enable pgvector extension
-    await client.query('CREATE EXTENSION IF NOT EXISTS vector');
+    // await client.query('CREATE EXTENSION IF NOT EXISTS vector');
     
     // Create tables
     await client.query(`
