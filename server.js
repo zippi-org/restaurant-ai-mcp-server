@@ -818,21 +818,13 @@ app.post('/setup/populate-knowledge-base', async (req, res) => {
     
     // Insert brand guidelines
     const guidelineResult = await client.query(`
-      INSERT INTO brand_guidelines (guideline_category, guideline_name, guideline_description, do_examples, dont_examples, applies_to, priority_level) VALUES
-      ('voice_tone', 'Bill Bryson Conversational Style', 'Write from personal experience with warm, observational tone and self-deprecating humor',
-       '{"I think what surprised me most...", "Maybe it''s just me, but...", "The thing that struck me was..."}',
-        '{"Delve into", "At its core", "Game-changing", "Cutting-edge", "Streamline"}',
-        '{"blog_content", "social_posts"}',
-        '{"With margins already at 3-5%...", "Given the current labor shortage...", "For restaurants running lean..."}',
-        '{"This revolutionary solution...", "Transform your entire business...", "Effortlessly streamline..."}',
-        '{"blog_content", "analysis"}',
-      ('financial_focus', 'ROI and Cost Impact', 'Lead with specific financial implications and realistic implementation timelines',
-       '["$40,000 annual savings", "18-month payback period", "Reduces labor costs by 25%"]',
-       '["Significant savings", "Improved efficiency", "Cost-effective solution"]',
-       '["blog_content", "social_posts", "analysis"]', 1)
-      ON CONFLICT DO NOTHING
-      RETURNING id
-    `);
+  INSERT INTO brand_guidelines (guideline_category, guideline_name, guideline_description, priority_level) VALUES
+  ('voice_tone', 'Bill Bryson Conversational Style', 'Write from personal experience with warm, observational tone and self-deprecating humor', 1),
+  ('restaurant_context', 'Industry Reality Check', 'Always acknowledge the practical challenges restaurant operators face', 1),
+  ('financial_focus', 'ROI and Cost Impact', 'Lead with specific financial implications and realistic implementation timelines', 1)
+  ON CONFLICT DO NOTHING
+  RETURNING id
+`);
     
     client.release();
     
