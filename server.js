@@ -181,7 +181,7 @@ app.post('/knowledge/check-duplicates', async (req, res) => {
     lookbackDate.setDate(lookbackDate.getDate() - lookback_days);
     
     const existingArticles = await client.query(`
-      SELECT title, url, title_embedding, published_date 
+      SELECT title, url, published_date 
       FROM processed_articles 
       WHERE processed_date > $1 AND topic = $2
     `, [lookbackDate, topic]);
