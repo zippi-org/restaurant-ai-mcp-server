@@ -577,7 +577,9 @@ Make them engaging, action-oriented, and platform-appropriate.
 Return as JSON with exact platform keys.`;
 
     const result = await model.generateContent(titlePrompt);
-    const optimizedTitles = JSON.parse(result.response.text());
+    const responseText = result.response.text();
+    const cleanedText = responseText.replace(/```json\n?/g, '').replace(/\n?```/g, '');
+    const optimizedTitles = JSON.parse(cleanedText);
     
     res.json({
       style_guide: {
