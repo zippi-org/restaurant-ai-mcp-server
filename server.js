@@ -356,7 +356,9 @@ EXTRACT:
 Return as JSON with these exact keys: primary_theme, business_impact_area, selection_reasoning, analysis_quality_score, content_uniqueness_score`;
 
     const result = await model.generateContent(analysisPrompt);
-    const insights = JSON.parse(result.response.text());
+    const responseText = result.response.text();
+    const cleanedText = responseText.replace(/```json\n?/g, '').replace(/\n?```/g, '');
+    const insights = JSON.parse(cleanedText);
     
     // Store in database
     const stored = await client.query(`
