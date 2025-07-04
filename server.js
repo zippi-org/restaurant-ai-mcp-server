@@ -472,7 +472,8 @@ app.post('/content/store-blog', async (req, res) => {
     const client = await pool.connect();
     
     // Extract title and calculate metrics
-    const title = content.split('\n')[0].replace(/^#\s*/, '');
+    const contentString = typeof content === 'string' ? content : JSON.stringify(content);
+    const title = contentString.split('\n')[0].replace(/^#\s*/, '');
     const word_count = content.split(/\s+/).length;
     const estimated_read_time = Math.ceil(word_count / 200);
     
